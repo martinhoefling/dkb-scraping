@@ -2,10 +2,13 @@
 import getpass
 import logging
 import os
+import time
 from grab import Grab
 logging.basicConfig(level=logging.INFO)
 
 LOG = logging.getLogger(__name__)
+DELAY = 0.1
+
 
 ARCHIV_URL='https://www.dkb.de/banking/postfach/ordner?$event=gotoFolder&folderNameOrId=archiv'
 LEGACY_MESSAGE= 'https://www.dkb.de/DkbTransactionBanking/content/mailbox/Dialogs/ESafe/Details.xhtml?$event=downloadMessage'
@@ -23,7 +26,7 @@ class DKBGrabber():
 
     def login(self, username, pin):
         self.g.go('https://www.dkb.de/banking')
-        self.g.doc.set_input('j_username', username)
+        self.g.doc.set_input('j_username', str(username))
         self.g.doc.set_input('j_password', pin)
         self.g.doc.submit()
         LOG.info('Login complete')
@@ -66,22 +69,28 @@ class DKBGrabber():
         docs = names_and_links(newstyle_attachments)
         for doc in docs:
             self._download_document(doc, folder_name)
+            time.sleep(DELAY)
 
         # Old style attachments require an extra step
         old_links = names_and_links(oldstyle_attachments)
         for old_link in old_links:
             self.g.go(old_link[1])
             self._download_document([old_link[0], LEGACY_MESSAGE], folder_name)
+            time.sleep(DELAY)
 
     def _download_document(self, document, folder):
-        self.g.go(document[1])
+        try:
+            self.g.go(document[1])
+        except Exception as e:
+            print('downloading {} failed'.format(document[0]))
+            raise e
         print('downloading document {}'.format(document[0]))
         with open(os.path.join(folder, document[0] + '.pdf'), 'wb') as fh:
             fh.write(self.g.doc.body)
 
 if __name__ == '__main__':
-    user = input('DKB User:')
-    password = getpass.getpass('DKB Password:')
+    user = input('DKB User: ')
+    password = getpass.getpass('DKB Password: ')
     g = DKBGrabber()
     g.login(user, password)
     g.download_archiv()
