@@ -10,8 +10,9 @@ LOG = logging.getLogger(__name__)
 DELAY = 0.1
 
 
-ARCHIV_URL='https://www.dkb.de/banking/postfach/ordner?$event=gotoFolder&folderNameOrId=archiv'
-LEGACY_MESSAGE= 'https://www.dkb.de/DkbTransactionBanking/content/mailbox/Dialogs/ESafe/Details.xhtml?$event=downloadMessage'
+ARCHIV_URL = 'https://www.dkb.de/banking/postfach/ordner?$event=gotoFolder&folderNameOrId=archiv'
+LEGACY_MESSAGE = 'https://www.dkb.de/DkbTransactionBanking/content/mailbox/Dialogs/ESafe/Details.xhtml?$event=downloadMessage'
+DATA_DIRECTORY = 'data'
 
 
 def names_and_links(selection):
@@ -30,6 +31,9 @@ class DKBGrabber():
         self.g.doc.set_input('j_password', pin)
         self.g.doc.submit()
         LOG.info('Login complete')
+
+    def logout(self):
+        self.g.go('https://www.dkb.de/DkbTransactionBanking/banner.xhtml?$event=logout')
 
     def download_archiv(self):
         folders = self._get_folders(ARCHIV_URL)
@@ -68,25 +72,32 @@ class DKBGrabber():
 
         docs = names_and_links(newstyle_attachments)
         for doc in docs:
-            self._download_document(doc, folder_name)
-            time.sleep(DELAY)
+            created = self._download_document(doc, folder_name)
+            if created:
+                time.sleep(DELAY)
 
         # Old style attachments require an extra step
         old_links = names_and_links(oldstyle_attachments)
         for old_link in old_links:
             self.g.go(old_link[1])
-            self._download_document([old_link[0], LEGACY_MESSAGE], folder_name)
-            time.sleep(DELAY)
+            created = self._download_document([old_link[0], LEGACY_MESSAGE], folder_name)
+            if created:
+                time.sleep(DELAY)
 
     def _download_document(self, document, folder):
-        try:
-            self.g.go(document[1])
-        except Exception as e:
-            print('downloading {} failed'.format(document[0]))
-            raise e
-        print('downloading document {}'.format(document[0]))
-        with open(os.path.join(folder, document[0] + '.pdf'), 'wb') as fh:
-            fh.write(self.g.doc.body)
+        document_name = os.path.join(DATA_DIRECTORY, folder, document[0] + '.pdf')
+        if not os.path.isfile(document_name):
+            try:
+                self.g.go(document[1])
+            except Exception as e:
+                print('downloading {} failed'.format(document[0]))
+                raise e
+            print('downloading document {}'.format(document[0]))
+            with open(document_name, 'wb') as fh:
+                fh.write(self.g.doc.body)
+            return True
+        print('skipping document {}'.format(document[0]))
+        return False
 
 if __name__ == '__main__':
     user = input('DKB User: ')
@@ -94,3 +105,4 @@ if __name__ == '__main__':
     g = DKBGrabber()
     g.login(user, password)
     g.download_archiv()
+    g.logout()
