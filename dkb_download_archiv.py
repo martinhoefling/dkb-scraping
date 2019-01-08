@@ -38,9 +38,9 @@ class DKBGrabber():
     def download_archiv(self):
         folders = self._get_folders(ARCHIV_URL)
         for folder in folders:
-            if not os.path.exists(folder[0]):
-                LOG.info('Creating folder {}'.format(folder[0]))
-                os.makedirs(folder[0])
+            if not os.path.exists(os.path.join(DATA_DIRECTORY, folder[0])):
+                LOG.info('Creating folder {}'.format(os.path.join(DATA_DIRECTORY, folder[0])))
+                os.makedirs(os.path.join(DATA_DIRECTORY, folder[0]))
             self._download_documents_in_folder(folder)
         LOG.info('Downloading archive complete')
 
