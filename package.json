@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "puppeteer": "^2.0.0"
+  },
+  "scripts": {
+    "scrape": "node scrape-dkb.js"
+  }
+}
