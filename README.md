@@ -13,12 +13,8 @@ Lädt das gesamte Archiv (Kontoauszüge, Kreditkartenabrechnungen, Mitteilungen,
     # git clone https://github.com/martinhoefling/dkb-scraping.git
     # cd dkb-scraping
 
-then via pip
+via yarn
 
-    # pip install -r requirements.txt
-    # python3 dkb_download_archiv.py
+    # yarn
+    # npm run scrape
 
-or using pipenv
-    
-    # pipenv install
-    # ./dkb_download_archiv.py

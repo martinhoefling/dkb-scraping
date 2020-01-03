@@ -1,8 +1,16 @@
 {
   "dependencies": {
+    "prettier": "^1.19.1",
     "puppeteer": "^2.0.0"
   },
   "scripts": {
-    "scrape": "node scrape-dkb.js"
+    "scrape": "node scrape-dkb.js",
+    "prettier": "prettier --write *.js",
+    "lint": "eslint *.js"
+  },
+  "type": "module",
+  "main": "scrape-dkb.js",
+  "devDependencies": {
+    "eslint": "^6.8.0"
   }
 }
