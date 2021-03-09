@@ -7,11 +7,11 @@ const parseDataUrl = dataUrl => {
   if (matches.length !== 3) {
     throw new Error("Could not parse data URL.");
   }
-  return { mime: matches[1], buffer: Buffer.from(matches[2], "base64") };
+  return { buffer: Buffer.from(matches[2], "base64") };
 };
 
 export async function saveContent(content, filename, folder) {
-  const { mime, buffer } = parseDataUrl(content);
+  const { buffer } = parseDataUrl(content);
   mkdirSync(join(BASEDIR, getTargetFolder(filename, folder)), {
     recursive: true
   });
@@ -41,6 +41,10 @@ function getTargetFolder(filename, folder) {
     case "Wertpapierdokumente":
       match = filename.match(/vom \d\d\.\d\d\.(\d\d\d\d)/);
       depot = filename.match(/zu Depot (\d+)/);
+      if (!match) {
+        match = filename.match(/Kosteninformation für das Jahr (\d+) zu Depot/);
+      }
+      if (!match) throw new Error("Did not match " + filename);
       return join(folder, depot[1], match[1]);
     default:
       return folder;
