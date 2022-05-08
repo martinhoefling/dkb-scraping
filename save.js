@@ -1,6 +1,6 @@
 import { mkdirSync, existsSync, writeFileSync } from "fs";
 import { join } from "path";
-const BASEDIR = "./data";
+const BASEDIR = process.env.TARGET_DIR || "./data";
 
 const parseDataUrl = dataUrl => {
   const matches = dataUrl.match(/^data:(.+);base64,(.+)$/);
@@ -32,13 +32,13 @@ function getTargetFolder(filename, folder) {
   switch (folder) {
     case "Kontoauszüge":
       match = filename.match(/Kontoauszug Nr\. \d+_(\d+) zu Konto (\d+)\.pdf/);
-      if (!match) throw new Error("Did not match " + filename);
+      if (!match) throw new Error("Did not match " + filename + " in Kontoauszüge");
       return join(folder, match[2], match[1]);
     case "Kreditkartenabrechnungen":
       match = filename.match(
         /Kreditkartenabrechnung (\d+_+\d+) per \d\d\.\d\d\.(\d+)\.pdf/
       );
-      if (!match) throw new Error("Did not match " + filename);
+      if (!match) throw new Error("Did not match " + filename + " in Kreditkartenabrechnungen");
       return join(folder, match[1], match[2]);
     case "Wertpapierdokumente":
       match = filename.match(/vom \d\d\.\d\d\.(\d\d\d\d)/);
@@ -46,7 +46,7 @@ function getTargetFolder(filename, folder) {
       if (!match) {
         match = filename.match(/Kosteninformation für das Jahr (\d+) zu Depot/);
       }
-      if (!match || !depot) throw new Error("Did not match " + filename);
+      if (!match || !depot) throw new Error("Did not match " + filename + " in Wertpapierdokumente");
       return join(folder, depot[1], match[1]);
     default:
       return folder;
