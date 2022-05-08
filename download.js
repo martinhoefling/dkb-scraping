@@ -84,7 +84,7 @@ async function downloadLink(page, link, folder) {
   if (!(link.label && link.link)) {
     throw new Error(`link has only label ${link.label} and ${link.link}`);
   }
-  const filename = `${link.label}.pdf`.replaceAll("*", "_").replaceAll("/", "_");
+  const filename = `${link.label}.pdf`.replaceAll("*", "_").replaceAll("/", "_").replaceAll('"', "_");
   if (fileExists(filename, folder)) {
     console.log("File", filename, "url");
     return;
