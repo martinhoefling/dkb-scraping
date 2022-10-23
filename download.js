@@ -1,10 +1,17 @@
 import { saveContent, fileExists } from "./save.js";
 
 export async function download(page) {
-  const folders = await getFolders(page);
+  let folders = await getFolders(page);
   console.log("Archive Folders: ", folders);
-  let folder;
-  for (folder of folders) {
+  if (folders.length == 0) folders =
+    [
+      {
+        lable: "Archiv",
+        link: "https://www.dkb.de/banking/postfach/ordner?$event=gotoFolder&folderNameOrId=archiv"
+      }
+
+    ]
+  for (let folder of folders) {
     await downloadFolder(page, folder);
   }
 }

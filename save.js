@@ -29,6 +29,7 @@ export function fileExists(filename, folder) {
 
 function getTargetFolder(filename, folder) {
   let match, depot;
+  if (!folder) return "";
   switch (folder) {
     case "Kontoauszüge":
       match = filename.match(/Kontoauszug Nr\. \d+_(\d+) zu Konto (\d+)\.pdf/);
