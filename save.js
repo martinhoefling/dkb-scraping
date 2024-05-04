@@ -32,8 +32,12 @@ function getTargetFolder(filename, folder) {
   if (!folder) return "";
   switch (folder) {
     case "Kontoauszüge":
-      match = filename.match(/Kontoauszug Nr\. \d+_(\d+) zu Konto (\d+)\.pdf/);
-      if (!match) throw new Error("Did not match " + filename + " in Kontoauszüge");
+      match = filename.match(/Kontoauszug\s+ \d+_(\d+) vom \d+\.\d+\.\d+ zu Konto (\d+)\.pdf/);
+      if (!match) {
+        match = filename.match(/Kontoauszug Nr\. \d+_(\d+) zu Konto (\d+)\.pdf/);
+        if (!match) throw new Error("Did not match " + filename + " in Kontoauszüge");
+        return join(folder, match[2], match[1]);
+      }
       return join(folder, match[2], match[1]);
     case "Kreditkartenabrechnungen":
       match = filename.match(
