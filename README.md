@@ -1,3 +1,5 @@
+### DKB has discontinued their legacy interface which was the prerequisite for the scraping to work.
+
 # dkb-scraping
 
 ## Currently:
